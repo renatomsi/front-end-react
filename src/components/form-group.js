@@ -3,8 +3,8 @@ import React from "react";
 
 export default function formGroup(props){
     return(
-        <div className="form-group">
-            <label htmlFor={props.htmlFor}>{props.label}</label>
+        <div className="form-group mt-4">
+            <label htmlFor={props.htmlFor} className="form-label ">{props.label}</label>
             {props.children}
         </div>
     )

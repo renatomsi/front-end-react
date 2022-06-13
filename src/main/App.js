@@ -1,14 +1,17 @@
 import React, {useState} from 'react';
-import Login from './views/login';
-
-import 'bootswatch/dist/minty/bootstrap.css'
-import './custom.css'
+import 'bootswatch/dist/flatly/bootstrap.css'
+import '../custom.css'
+import Rotas from './rotas';
+import Navbar from '../components/navbar'
 
 function App() {
   return (
-    <div >
-      <Login />
-    </div>
+    <>
+      <Navbar />
+      <div className='container' >
+        <Rotas />
+      </div>
+    </>
   );
 }
 
