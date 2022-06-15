@@ -2,17 +2,31 @@ import React, {useState} from 'react'
 import Card from '../components/card';
 import FormGroup from '../components/form-group';
 import { useNavigate } from 'react-router-dom'
-
-// import 'bootswatch/dist/flatly/bootstrap.css'
+import axios from 'axios';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 export default function Login(props){
 
   const [email, setemail] = useState("");
   const [senha, setsenha] = useState("");
+  const MySwal = withReactContent(Swal)
 
-  function entrar(){
-    console.log("Email: " + email);
-    console.log("Senha: " + senha);
+  async function entrar(){
+    await axios.post("http://localhost:8080/api/usuarios/auth",{
+      email: email,
+      senha: senha
+    }).then( response => {
+      localStorage.setItem("_usuario_logado_", JSON.stringify(response.data))
+      navigate('/home');
+    }).catch(erro =>{
+      MySwal.fire({
+        title: 'Error!',
+        text: erro.response.data,
+        icon: 'error',
+        confirmButtonText: 'Fechar'
+      })
+    })
   }
   const navigate = useNavigate();
 

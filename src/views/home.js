@@ -1,7 +1,20 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
+import axios from "axios";
 
 export default function Home() {
   const [saldo, setsaldo] = useState(0);
+
+  useEffect(() => {
+    const usuarioLogadoString = localStorage.getItem('_usuario_logado_')
+    const usuarioLogado = JSON.parse(usuarioLogadoString)
+
+    axios.get(`http://localhost:8080/api/usuarios/${usuarioLogado.id}/saldo`)
+      .then(response => {
+        setsaldo(response.data)
+      }).catch(error => {
+        console.log(error)
+      })
+  }, []);
 
   return(
     <div className="container-fluid bg-light p-5">
