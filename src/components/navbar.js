@@ -14,7 +14,7 @@ export default function Navbar(){
           <ul className="navbar-nav">
             <NavbarItens href="/home" label="Home" />
             <NavbarItens href="/cadastro-usuario" label="Usuarios" />
-            <NavbarItens href="/" label="Lançamentos" />
+            <NavbarItens href="/consulta-lancamentos" label="Lançamentos" />
             <NavbarItens href="/login" label="Login" />
           </ul>
         </div>

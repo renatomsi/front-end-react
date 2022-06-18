@@ -2,30 +2,28 @@ import React, {useState} from 'react'
 import Card from '../components/card';
 import FormGroup from '../components/form-group';
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios';
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
+
+import { adicionaItem } from '../app/service/localStorageService';
+import { autenticar } from '../app/service/usuarioService';
+import { notifyError, notifySuccess } from '../components/notifications'; 
+
 
 export default function Login(props){
 
   const [email, setemail] = useState("");
   const [senha, setsenha] = useState("");
-  const MySwal = withReactContent(Swal)
+
 
   async function entrar(){
-    await axios.post("http://localhost:8080/api/usuarios/auth",{
+    await autenticar({
       email: email,
       senha: senha
     }).then( response => {
-      localStorage.setItem("_usuario_logado_", JSON.stringify(response.data))
+      adicionaItem('_usuario_logado_', response.data)
+      // notifySuccess(`Bem vindo, ${response.data.name}`)
       navigate('/home');
     }).catch(erro =>{
-      MySwal.fire({
-        title: 'Error!',
-        text: erro.response.data,
-        icon: 'error',
-        confirmButtonText: 'Fechar'
-      })
+      notifyError(erro.response.data);
     })
   }
   const navigate = useNavigate();
