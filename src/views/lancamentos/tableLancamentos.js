@@ -12,6 +12,11 @@ export default function TableLancamentos(props) {
           <td>{lancamento.tipo}</td>
           <td>{lancamento.mes}</td>
           <td>{lancamento.status}</td>
+          <td>
+            <button type="button" onClick={e => props.editAction(lancamento.id)} className="btn btn-primary">Editar</button>
+            <button type="button" onClick={e => props.deleteAction(lancamento)} className="btn btn-danger">Deletar</button>
+
+          </td>
 
       </tr>
     )

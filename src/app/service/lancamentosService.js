@@ -48,9 +48,19 @@ export function buscarLancamentos(lancamentoFiltro) {
     params = `${params}&descricao=${lancamentoFiltro.descricao}`;
   }
   
-  console.log(params)
   return (
     httpClient.get(params)
   )
 
+}
+
+export function deletarPorId(id) {
+  return(
+    httpClient.delete(`${urlLancamentos}/${id}`)
+  )
+  
+}
+
+export function salvarLancamento(lancamento) {
+  return httpClient.post(`${urlLancamentos}/`, lancamento)
 }

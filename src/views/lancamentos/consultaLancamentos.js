@@ -3,27 +3,39 @@ import Card from "../../components/card";
 import FormGroup from "../../components/form-group";
 import SelectMenu from "../../components/selectMenu";
 import TableLancamentos from "./tableLancamentos";
-import { buscarLancamentos, buscaListaMeses, buscaListasTipos } from "../../app/service/lancamentosService";
+import { buscarLancamentos, buscaListaMeses, buscaListasTipos, deletarPorId } from "../../app/service/lancamentosService";
 import { obterItem } from "../../app/service/localStorageService";
 import * as messages from "../../components/notifications";
+import { ConfirmDialog } from 'primereact/confirmdialog';
+import { Button } from 'primereact/button';
+import { useNavigate } from "react-router-dom";
 
 export default function ConsultaLancamentos(props) {
 
-  
   const [ano, setano] = useState("");
   const [mes, setmes] = useState("");
   const [tipo, settipo] = useState("");
   const [descricao, setdescricao] = useState("");
-  const [lancamentos, setlancamentos] = useState([]);
+  const [lancamentos, setLancamentos] = useState([]);
+  const [showDialog, setshowDialog] = useState(false);
+  const [lancamentoDeletar, setlancamentoDeletar] = useState({});
+
+  const navigate = useNavigate();
+  function goCadastro() {
+    navigate('/cadastro-lancamentos'); 
+  };
 
   function buscar(){
 
     if (!ano){
       messages.notifyError("Campo Ano obrigatório!")
+      return false;
+    }else if (ano.length < 4){
+      messages.notifyError("Informe um Ano válido!")
+      return false;
     }
 
     const usuarioLogado = obterItem('_usuario_logado_')
-    console.log(usuarioLogado)
 
     const lancamentoFiltro = {
       ano: ano,
@@ -35,17 +47,51 @@ export default function ConsultaLancamentos(props) {
 
     buscarLancamentos(lancamentoFiltro)
     .then(response => {
-      setlancamentos(response.data)
+      setLancamentos(response.data)
     }).catch(erro => {
       console.log(erro)
     })
     
   }
 
+  function preparaDelete(lancamentoDeletar) {
+    setlancamentoDeletar(lancamentoDeletar)
+    setshowDialog(true);
+  }
+
+  function cancelDelete(lancamentoDeletar) {
+    setlancamentoDeletar(lancamentoDeletar)
+    setshowDialog(false);
+  }
+
+  function deletar(lancamentoDeletar) {
+    setshowDialog(false)
+     deletarPorId(lancamentoDeletar.id)
+    .then(response => {
+      messages.notifySuccess("Lançamento deletado com sucesso!")
+      buscar()
+      setlancamentoDeletar({})
+    }).catch(error =>{
+      messages.notifyError( error.response.data,"Ocorreu um erro ao tentar deletar o Lançamento!")
+    })
+    
+  }
+
+  function editar(id) {
+    navigate(`/cadastro-lancamentos/${id}`)
+    
+  }
+
+  const footer = (
+      <div>
+          <Button className="p-button-raised p-button-danger" label="Cancelar" icon="pi pi-times" onClick={e => cancelDelete({})}  />
+          <Button className="p-button-raised p-button-info" label="Confirmar" icon="pi pi-check"  onClick={e => deletar(lancamentoDeletar)}  />
+      </div>
+  );
+
   const meses = buscaListaMeses();
 
   const tipos = buscaListasTipos();
-
 
   return(<>
     <Card title="Consulta Lançamentos">
@@ -66,7 +112,7 @@ export default function ConsultaLancamentos(props) {
             <FormGroup label="Descrição: " htmlFor="inputDesc" >
               <input type="text" className="form-control" 
                       value={descricao} onChange={e => setdescricao(e.target.value)}
-                     id="inputDesc" placeholder="Digite o Ano" />
+                     id="inputDesc" placeholder="Digite a descrição" />
             </FormGroup>
 
             <FormGroup label="Tipo de Lançamentos: " htmlFor="selectTipos" >
@@ -77,9 +123,8 @@ export default function ConsultaLancamentos(props) {
         </div>
       </div>
       <button type="button" onClick={buscar}  className="btn btn-success mt-4">Buscar</button>
-      <button type="button"  className="btn btn-danger mt-4">Cadastrar</button>
+      <button type="button" onClick={goCadastro}  className="btn btn-danger mt-4">Cadastrar</button>
       <br />
-
 
     </Card>
       <div className="">
@@ -90,13 +135,21 @@ export default function ConsultaLancamentos(props) {
             </div>
 
             <div className="bs-component">
-              <TableLancamentos lancamentos={lancamentos} />
+              { lancamentos.length > 0 && 
+              <TableLancamentos lancamentos={lancamentos} deleteAction={preparaDelete} editAction={editar} /> }
             </div>
             </div>
         </div>
-        
-        
-          </div></>
+    </div>
+    <div>
+      <ConfirmDialog visible={showDialog} modal={true} onHide={() => setshowDialog(false)}  message="Confirma a exclusão deste Lançamento?"
+                     header="Confirmação" icon="pi pi-exclamation-triangle" draggable={false} 
+                    //  accept={e => deletar(lancamentoDeletar)} reject={e => cancelDelete({})}
+                    //  acceptLabel="Sim" rejectLabel="Cancelar"
+                     footer={footer}  />
+    </div>
+    
+    </>
 
     
 
